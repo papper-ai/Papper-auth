@@ -84,4 +84,4 @@ async def refresh_token_regenerate(response: Response,
 @auth_router.post("/user")
 async def get_user(uuid: str = Depends(authentication_with_token), user_repository: UserRepository = Depends(UserRepository)):
     user = await user_repository.get_user_by_uuid(uuid)
-    print(user.email)
+    return {"user_email": user.email}
