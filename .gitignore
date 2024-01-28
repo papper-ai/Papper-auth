@@ -1,0 +1,9 @@
+.env
+test.py
+__pycache__
+bot.log
+gsheets_key.json
+venv
+.idea/
+docker-compose.yaml
+/auth/certs/
