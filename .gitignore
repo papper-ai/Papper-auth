@@ -5,5 +5,4 @@ bot.log
 gsheets_key.json
 venv
 .idea/
-docker-compose.yaml
 /auth/certs/
