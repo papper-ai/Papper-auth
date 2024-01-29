@@ -12,6 +12,7 @@ from auth import utils, email_sender
 
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth_jwt.access_token_expire_minutes
 REFRESH_TOKEN_EXPIRE_HOURS = settings.auth_jwt.refresh_token_expire_hours
+DOMAIN = settings.domain
 auth_router = APIRouter(prefix="/personal")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="personal/token")
 
@@ -52,10 +53,11 @@ async def login_for_access_token(response: Response,
     response.status_code = 200
     response.init_headers(headers={'Authorization': 'bearer' + access_token})
     response.set_cookie(key="access-token", value=access_token,
-                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), httponly=True,
-                        domain=".localhost", samesite="lax")
+                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), 
+                        domain=DOMAIN, samesite="lax", httponly=True)
     response.set_cookie(key="refresh-token", value=refresh_token,
-                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), httponly=True)
+                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), 
+                        domain=DOMAIN, samesite="lax", httponly=True)
     return response
 
 
@@ -73,15 +75,17 @@ async def refresh_token_regenerate(response: Response,
     response.status_code = 200
     response.init_headers(headers={'Authorization': 'bearer' + access_token})
 
-    response.set_cookie(key="access-token", value=access_token,
-                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), httponly=True,
-                        domain="localhost")
+    response.set_cookie(key="access-token", 
+                        value=access_token,
+                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(),
+                        domain=DOMAIN, samesite="lax", httponly=True)
     response.set_cookie(key="refresh-token", value=refresh_token,
-                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), httponly=True)
+                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), 
+                        domain=DOMAIN, samesite="lax", httponly=True)
     return response
 
 
-@auth_router.post("/user")
+@auth_router.get("/user")
 async def get_user(uuid: str = Depends(authentication_with_token), user_repository: UserRepository = Depends(UserRepository)):
     user = await user_repository.get_user_by_uuid(uuid)
     return {"user_email": user.email}

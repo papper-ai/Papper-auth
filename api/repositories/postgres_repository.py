@@ -1,15 +1,11 @@
-import uuid
-
-from fastapi import HTTPException, status
-from pydantic import EmailStr
-from sqlalchemy import pool, event, select
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-
-from config import settings
-
 from abc import ABC, abstractmethod
 
+from config import settings
+from pydantic import EmailStr
 from repositories import models
+from sqlalchemy import pool, select
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
 
 engine = create_async_engine(settings.database_url, poolclass=pool.AsyncAdaptedQueuePool,
                              pool_size=12, max_overflow=4, pool_pre_ping=True)

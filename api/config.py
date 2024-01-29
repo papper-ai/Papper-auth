@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings
-from pydantic import BaseModel
 from pathlib import Path
+
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).parent
 
@@ -26,13 +27,14 @@ class Settings(BaseSettings):
     auth_jwt: AuthJWT = AuthJWT()
     mailgun_api_key: str
 
+    domain: str
+
     @property
     def database_url(self) -> str:
         return f"{self.db_dialect}+{self.db_async_driver}://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
     class Config:
-        env_file = ".env"
-        extra = "allow"
+        extra = "ignore"
 
 
 settings = Settings()

@@ -1,5 +1,3 @@
-import asyncio
-
 import aiohttp
 
 from config import settings
@@ -39,5 +37,3 @@ async def send_email(code: str, email: str):
                                     "html": get_html(code)}) as response:
             print(response.status)
             print(await response.text())
-
-
