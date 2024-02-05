@@ -1,11 +1,20 @@
 FROM python:3.11.7-slim
 
+RUN addgroup --gid 10001 apiuser && \
+    adduser --uid 10001 --gid 10001 --disabled-password --gecos "" apiuser
+
 WORKDIR /usr/src/api
 
 ENV PYTHONPATH=/usr/src/api
 
 COPY requirements.txt .
 
-RUN apt-get update && pip install --upgrade pip && pip install -r requirements.txt  
+RUN apt-get update && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY . .
+COPY --chown=apiuser:apiuser . .
+
+USER apiuser
