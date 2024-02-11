@@ -3,6 +3,10 @@ from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import DeclarativeBase, mapped_column
 
 
+def uuid_default():
+    return str(uuid.uuid4())
+
+
 class Base(DeclarativeBase):
     pass
 
