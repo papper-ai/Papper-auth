@@ -54,10 +54,9 @@ async def login_for_access_token(response: Response,
     response.init_headers(headers={'Authorization': 'bearer' + access_token})
     response.set_cookie(key="access-token", value=access_token,
                         expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), 
-                        domain=DOMAIN, samesite="lax", httponly=True)
+                        domain=f".{DOMAIN}", samesite="lax", httponly=True)
     response.set_cookie(key="refresh-token", value=refresh_token,
-                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), 
-                        domain=DOMAIN, samesite="lax", httponly=True)
+                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), httponly=True)
     return response
 
 
@@ -77,11 +76,10 @@ async def refresh_token_regenerate(response: Response,
 
     response.set_cookie(key="access-token", 
                         value=access_token,
-                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(),
-                        domain=DOMAIN, samesite="lax", httponly=True)
+                        expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), httponly=True,
+                        domain=DOMAIN)
     response.set_cookie(key="refresh-token", value=refresh_token,
-                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), 
-                        domain=DOMAIN, samesite="lax", httponly=True)
+                        expires=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS).total_seconds(), httponly=True)
     return response
 
 
