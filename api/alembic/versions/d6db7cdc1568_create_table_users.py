@@ -24,8 +24,7 @@ def upgrade() -> None:
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.Column('uuid', sa.String(), nullable=False),
-    sa.Column('history', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('uuid', sa.String(), nullable=False, unique=True),
     sa.PrimaryKeyConstraint('email')
     )
     # ### end Alembic commands ###
