@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     mailgun_api_key: str
 
     domain: str
+    host_port: str
 
     @property
     def database_url(self) -> str:
