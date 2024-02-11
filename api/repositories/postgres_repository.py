@@ -38,10 +38,7 @@ class UserRepository(AbstractRepository):
     async def get(self, email: EmailStr) -> models.User or None:  # works only with PK
         async with self.session as session:
             user = await session.get(models.User, email)
-            if user:
-                return user
-            else:
-                return None
+            return user
 
     async def get_user_by_uuid(self, uuid: str) -> models.User or None:
         async with self.session as session:
