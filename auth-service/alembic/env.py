@@ -1,7 +1,6 @@
 import asyncio
-import os
 from logging.config import fileConfig
-from repositories.models import Base
+from src.repositories.models import Base
 from config import settings
 
 from sqlalchemy import pool

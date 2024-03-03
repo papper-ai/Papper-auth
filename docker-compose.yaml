@@ -14,9 +14,9 @@ services:
     ports:
       - '${DB_CONTAINER_PORT}:${DB_PORT}'
   api:
-    build: api
+    build: auth-service
     volumes:
-      - ./api:/usr/src/api
+      - ./auth-service:/usr/src/auth-service
     env_file:
       - .env
     ports:

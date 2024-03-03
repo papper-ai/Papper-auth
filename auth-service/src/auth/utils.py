@@ -1,17 +1,17 @@
 import hashlib
-import random
 import secrets
+import typing
 from datetime import datetime, timedelta
 import jwt
-from fastapi import Depends, HTTPException, status
 
 from config import settings
-from repositories import models
-from repositories.postgres_repository import UserRepository
+from src.repositories import models
+from src.repositories.postgres_repository import UserRepository
 
 
-async def authenticate_user(email: str, password: str, user_repository: UserRepository) -> models.User or bool:
-    user = await user_repository.get(email)
+async def authenticate_user(login: str, password: str,
+                            user_repository: UserRepository) -> typing.Union[models.User, bool]:
+    user = await user_repository.get_user_by_login(login)
     if not hashlib.sha256(password.encode()).hexdigest() == user.password:
         return False
     return user
@@ -26,10 +26,10 @@ async def create_token(data: dict, expires_delta: timedelta = None):
 
 
 async def decode_token(token: str):
-    uuid = (
+    user_id = (
         jwt.decode(token, settings.auth_jwt.public_key_path.read_text(), algorithms=settings.auth_jwt.algorithm)).get(
-        "uuid")
-    return uuid
+        "user_id")
+    return user_id
 
 
 async def decode_access_token(token: str):
@@ -38,10 +38,6 @@ async def decode_access_token(token: str):
     return uuid
 
 
-def generate_password():
-    # 5 digits password
-    password = str(secrets.randbelow(100000)).zfill(5)
-
-    # hash password
+def hash_password(password: str):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    return password, hashed_password
+    return hashed_password

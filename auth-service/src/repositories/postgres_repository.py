@@ -1,8 +1,9 @@
+import typing
 from abc import ABC, abstractmethod
 
 from config import settings
 from pydantic import EmailStr
-from repositories import models
+from src.repositories import models
 from sqlalchemy import pool, select
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
@@ -35,14 +36,14 @@ class UserRepository(AbstractRepository):
             async with session.begin():
                 session.add(entity)
 
-    async def get(self, email: EmailStr) -> models.User or None:  # works only with PK
+    async def get(self, email: EmailStr) -> typing.Union[models.User, None]:  # works only with PK
         async with self.session as session:
             user = await session.get(models.User, email)
             return user
 
-    async def get_user_by_uuid(self, uuid: str) -> models.User or None:
+    async def get_user_by_login(self, login: str) -> typing.Union[models.User, None]:
         async with self.session as session:
-            query = select(models.User).where(models.User.uuid == uuid)
+            query = select(models.User).where(models.User.login == login)
             result = await session.execute(query)
             user = result.scalar_one_or_none()
             return user

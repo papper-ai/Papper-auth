@@ -3,11 +3,11 @@ FROM python:3.11.7-slim
 RUN addgroup --gid 10001 apiuser && \
     adduser --uid 10001 --gid 10001 --disabled-password --gecos "" apiuser
 
-WORKDIR /usr/src/api
+WORKDIR /usr/src/auth-service
 
-ENV PYTHONPATH=/usr/src/api
+ENV PYTHONPATH=/usr/src/auth-service
 
-COPY requirements.txt .
+COPY requirements/requirements.txt .
 
 RUN apt-get update && \
     pip install --upgrade pip && \

@@ -1,7 +1,7 @@
 import jwt.exceptions
-from fastapi import Depends, Cookie, HTTPException, status
+from fastapi import Cookie, HTTPException, status
 
-from auth import utils
+from src.auth import utils
 
 
 async def authentication_with_token(access_token: str = Cookie(alias="access-token")):

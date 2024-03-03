@@ -24,18 +24,26 @@ class Settings(BaseSettings):
     db_user: str
     db_password: str
 
+    db_container_port: int
+
     auth_jwt: AuthJWT = AuthJWT()
-    mailgun_api_key: str
 
     domain: str
     host_port: str
 
+    is_testing: bool
+
     @property
     def database_url(self) -> str:
-        return f"{self.db_dialect}+{self.db_async_driver}://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+        if self.is_testing:
+            return f"{self.db_dialect}+{self.db_async_driver}://{self.db_user}:{self.db_password}@localhost:{self.db_container_port}/{self.db_name}"
+        else:
+            return f"{self.db_dialect}+{self.db_async_driver}://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
     class Config:
         extra = "ignore"
+        if Path("../.env").exists():
+            env_file = "../.env"
 
 
 settings = Settings()
