@@ -21,19 +21,18 @@ class User(Base):
     name = mapped_column(String, nullable=False)
     surname = mapped_column(String, nullable=False)
 
-    used_secret_id = mapped_column(ForeignKey("secrets.id"), nullable=True)
+    used_secret = mapped_column(ForeignKey("secrets.secret"), nullable=True)
 
     created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_active = mapped_column(Boolean, default=True)
     
-    secrets = relationship("Secrets", back_populates="users")
+    secrets = relationship("Secret", back_populates="users")
 
 
-class Secrets(Base):
+class Secret(Base):
     __tablename__ = "secrets"
 
-    id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    secret = mapped_column(UUID(as_uuid=True), nullable=False, unique=True, default=uuid_default)
+    secret = mapped_column(UUID(as_uuid=True), default=uuid_default, primary_key=True)
 
     created_by = mapped_column(String, nullable=False)
     used_by = mapped_column(UUID(as_uuid=True))
