@@ -1,6 +1,8 @@
 import typing
 from abc import ABC, abstractmethod
 
+import uuid
+
 from config import settings
 from pydantic import EmailStr
 from src.repositories import models
@@ -13,8 +15,8 @@ engine = create_async_engine(settings.database_url, poolclass=pool.AsyncAdaptedQ
 
 Session = async_sessionmaker(
     bind=engine,
-    class_=AsyncSession
-)
+    class_=AsyncSession,
+    expire_on_commit=False)
 
 
 class AbstractRepository(ABC):
@@ -47,3 +49,19 @@ class UserRepository(AbstractRepository):
             result = await session.execute(query)
             user = result.scalar_one_or_none()
             return user
+
+
+class SecretRepository(AbstractRepository):
+    def __init__(self):
+        self.session = Session()
+
+    async def add(self, entity):
+        async with self.session as session:
+            async with session.begin():
+                session.add(entity)
+
+    async def get(self, secret_id) -> typing.Union[models.Secret, None]:
+        async with self.session as session:
+            async with session.begin():
+                secret = await session.get(models.Secret, secret_id)
+                return secret
