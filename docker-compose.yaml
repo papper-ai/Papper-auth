@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - '${DB_CONTAINER_PORT}:${DB_PORT}'
-  api:
+  auth-service:
     build: auth-service
     volumes:
       - ./auth-service:/usr/src/auth-service
