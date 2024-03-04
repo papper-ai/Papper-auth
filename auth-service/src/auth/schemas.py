@@ -1,8 +1,10 @@
+import uuid
+
 from pydantic import BaseModel
 
 
 class RegistrationRequest(BaseModel):
-    secret: str
+    secret: uuid.UUID
     name: str
     surname: str
     login: str
