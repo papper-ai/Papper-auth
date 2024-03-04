@@ -7,11 +7,11 @@ WORKDIR /usr/src/auth-service
 
 ENV PYTHONPATH=/usr/src/auth-service
 
-COPY requirements/requirements.txt .
+COPY /requirements/base.txt /requirements/
 
 RUN apt-get update && \
     pip install --upgrade pip && \
-    pip install -r requirements.txt && \
+    pip install -r /requirements/base.txt && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
