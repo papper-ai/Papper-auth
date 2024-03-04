@@ -3,10 +3,11 @@ import secrets
 import typing
 from datetime import datetime, timedelta
 import jwt
-
+import uuid
+from fastapi import Depends, HTTPException, status
 from config import settings
 from src.repositories import models
-from src.repositories.postgres_repository import UserRepository
+from src.repositories.postgres_repository import UserRepository, SecretRepository
 
 
 async def authenticate_user(login: str, password: str,
@@ -41,3 +42,15 @@ async def decode_access_token(token: str):
 def hash_password(password: str):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     return hashed_password
+
+
+async def check_secret(secret: uuid.UUID, secret_repository: SecretRepository):
+    secret_entity = await secret_repository.get(secret)
+    if not secret_entity:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid secret",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    else:
+        return secret_entity
