@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import Depends, HTTPException, status, APIRouter, Cookie, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -7,8 +9,8 @@ from pydantic import EmailStr
 from src.auth.dependencies import authentication_with_token
 from config import settings
 from src.repositories import models as repo_models
-from src.auth import models as auth_models
-from src.repositories.postgres_repository import UserRepository
+from src.auth import schemas as auth_models
+from src.repositories.postgres_repository import UserRepository, SecretRepository
 from src.auth import utils
 
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth_jwt.access_token_expire_minutes
@@ -20,8 +22,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="personal/token")
 
 
 @auth_router.post("/registration")
-async def registration(registration_request: auth_models.RegistrationRequest,
-                       user_repository: UserRepository = Depends(UserRepository)):
+async def registration(registration_request: auth_models.RegistrationRequest = Depends(),
+                       user_repository: UserRepository = Depends(UserRepository),
+                       secret_repository: SecretRepository = Depends(SecretRepository)):
     user = await user_repository.get_user_by_login(registration_request.login)
     if user:
         raise HTTPException(
@@ -29,9 +32,16 @@ async def registration(registration_request: auth_models.RegistrationRequest,
             detail="User already exists",
         )
     else:
+        secret_entity = await utils.check_secret(registration_request.secret, secret_repository)
+
+        secret_entity.used_by = user_id = uuid.uuid4()  # creating user_id
+        secret_entity.is_used = True
+        await secret_repository.add(secret_entity)
+
+        del registration_request.secret  # remove secret from request for easy **kwags
         registration_request.password = utils.hash_password(registration_request.password)
-        print(registration_request.model_dump())
-        await user_repository.add(repo_models.User(**registration_request.model_dump()))
+        await user_repository.add(repo_models.User(**registration_request.model_dump(), user_id=user_id,
+                                                   used_secret=secret_entity.secret))
 
 
 @auth_router.post("/token", description="Get access-token while user logs in")
