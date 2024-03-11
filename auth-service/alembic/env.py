@@ -1,7 +1,7 @@
 import asyncio
 from logging.config import fileConfig
 from src.repositories.models import Base
-from config import settings
+from src.config import settings
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
@@ -71,7 +71,7 @@ async def run_async_migrations() -> None:
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        poolclass=pool.NullPool
     )
 
     async with connectable.connect() as connection:

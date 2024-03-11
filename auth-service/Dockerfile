@@ -5,7 +5,7 @@ RUN addgroup --gid 10001 apiuser && \
 
 WORKDIR /usr/src/auth-service
 
-ENV PYTHONPATH=/usr/src/auth-service
+ENV PYTHONPATH=/usr/src/auth-service/src
 
 COPY /requirements/base.txt /requirements/
 

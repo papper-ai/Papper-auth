@@ -7,7 +7,7 @@ from datetime import timedelta
 from pydantic import EmailStr
 
 from src.auth.dependencies import authentication_with_token
-from config import settings
+from src.config import settings
 from src.repositories import models as repo_models
 from src.auth import schemas as auth_models
 from src.repositories.postgres_repository import UserRepository, SecretRepository

@@ -42,8 +42,8 @@ class Settings(BaseSettings):
 
     class Config:
         extra = "ignore"
-        if Path("../.env").exists():
-            env_file = "../.env"
+        if Path(r"C:\Users\desktop\PycharmProjects\Papper\.env").exists():
+            env_file = r"C:\Users\desktop\PycharmProjects\Papper\.env"
 
 
 settings = Settings()
