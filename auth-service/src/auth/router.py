@@ -1,17 +1,15 @@
-import uuid
-
-from fastapi import Depends, HTTPException, status, APIRouter, Cookie, Response
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
 
-from pydantic import EmailStr
+import uuid
+from fastapi import Depends, HTTPException, status, APIRouter, Cookie, Response
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from src.auth.dependencies import authentication_with_token
-from src.config import settings
-from src.repositories import models as repo_models
-from src.auth import schemas as auth_models
-from src.repositories.postgres_repository import UserRepository, SecretRepository
-from src.auth import utils
+from auth import schemas as auth_models
+from auth import utils
+from auth.dependencies import authentication_with_token, registration_depends
+from config import settings
+from repositories import models as repo_models
+from repositories.postgres_repository import UserRepository, SecretRepository
 
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth_jwt.access_token_expire_minutes
 REFRESH_TOKEN_EXPIRE_HOURS = settings.auth_jwt.refresh_token_expire_hours
@@ -22,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="personal/token")
 
 
 @auth_router.post("/registration")
-async def registration(registration_request: auth_models.RegistrationRequest = Depends(),
+async def registration(registration_request: auth_models.RegistrationRequest = Depends(registration_depends),
                        user_repository: UserRepository = Depends(UserRepository),
                        secret_repository: SecretRepository = Depends(SecretRepository)):
     user = await user_repository.get_user_by_login(registration_request.login)
@@ -38,9 +36,8 @@ async def registration(registration_request: auth_models.RegistrationRequest = D
         secret_entity.is_used = True
         await secret_repository.add(secret_entity)
 
-        del registration_request.secret  # remove secret from request for easy **kwags
         registration_request.password = utils.hash_password(registration_request.password)
-        await user_repository.add(repo_models.User(**registration_request.model_dump(), user_id=user_id,
+        await user_repository.add(repo_models.User(**registration_request.model_dump(exclude={"secret"}), user_id=user_id,
                                                    used_secret=secret_entity.secret))
 
 
@@ -100,3 +97,10 @@ async def get_user(user_id: str = Depends(authentication_with_token),
                    user_repository: UserRepository = Depends(UserRepository)):
     user = await user_repository.get(user_id)
     return user.__dict__
+
+
+@auth_router.get("/secrets")
+async def get_secrets(user_id: str = Depends(authentication_with_token),
+                      secret_repository: SecretRepository = Depends(SecretRepository)):
+    secrets = await secret_repository.get_secrets()
+    return secrets
