@@ -1,13 +1,15 @@
 import hashlib
-import secrets
 import typing
 from datetime import datetime, timedelta
+
 import jwt
 import uuid
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
+
 from config import settings
-from src.repositories import models
-from src.repositories.postgres_repository import UserRepository, SecretRepository
+from repositories import models
+from repositories.postgres_repository import UserRepository, SecretRepository
+from pydantic import UUID4
 
 
 async def authenticate_user(login: str, password: str,
@@ -35,7 +37,7 @@ async def decode_token(token: str):
 
 async def decode_access_token(token: str):
     uuid = (jwt.decode(token, settings.auth_jwt.public_key_path.read_text(),
-                       algorithms=settings.auth_jwt.algorithm)).get("uuid")
+                       algorithms=settings.auth_jwt.algorithm)).get("user_id")
     return uuid
 
 
