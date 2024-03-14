@@ -14,14 +14,14 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    user_id = mapped_column(UUID(as_uuid=True), default=uuid_default, primary_key=True)
+    user_id = mapped_column(UUID(as_uuid=False), default=uuid_default, primary_key=True)
     login = mapped_column(String, nullable=False, unique=True)
     password = mapped_column(String, nullable=False)
 
     name = mapped_column(String, nullable=False)
     surname = mapped_column(String, nullable=False)
 
-    used_secret = mapped_column(ForeignKey("secrets.secret"), nullable=True)
+    used_secret = mapped_column(ForeignKey("secrets.secret"), nullable=True, unique=True)
 
     created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_active = mapped_column(Boolean, default=True)
@@ -32,14 +32,17 @@ class User(Base):
 class Secret(Base):
     __tablename__ = "secrets"
 
-    secret = mapped_column(UUID(as_uuid=True), default=uuid_default, primary_key=True)
+    secret = mapped_column(UUID(as_uuid=False), default=uuid_default, primary_key=True)
 
     created_by = mapped_column(String, nullable=False)
-    used_by = mapped_column(UUID(as_uuid=True))
+    used_by = mapped_column(UUID(as_uuid=False))
     is_used = mapped_column(Boolean, server_default='false')
 
     created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     users = relationship("User", back_populates="secrets")
-    
+
+    # def __repr__(self):
+    #     return f"Secret(secret={self.secret!r}, created_by={self.created_by!r}, used_by={self.used_by!r}, is_used={self.is_used!r}, created_at={self.created_at!r})"
+    #
 
