@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from src.auth.router import auth_router
+from auth.router import auth_router
+import uvicorn
 
 app = FastAPI()
+app.include_router(auth_router)
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-
-app.include_router(auth_router)
