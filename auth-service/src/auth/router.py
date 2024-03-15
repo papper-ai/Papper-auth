@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from auth import schemas as auth_models
 from auth import utils
-from auth.dependencies import authentication_with_token, registration_depends
+from auth.dependencies import authentication_with_token, registration_depends, add_secret_depends
 from config import settings
 from repositories import models as repo_models
 from repositories.postgres_repository import UserRepository, SecretRepository
@@ -104,3 +104,9 @@ async def get_secrets(user_id: str = Depends(authentication_with_token),
                       secret_repository: SecretRepository = Depends(SecretRepository)):
     secrets = await secret_repository.get_secrets()
     return secrets
+
+
+@auth_router.post("/add_secret")
+async def add_secret(secret: auth_models.Secret = Depends(add_secret_depends),
+                     secret_repository: SecretRepository = Depends(SecretRepository)):
+    await secret_repository.add(repo_models.Secret(**secret.model_dump()))
