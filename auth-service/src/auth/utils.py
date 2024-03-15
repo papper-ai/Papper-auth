@@ -37,7 +37,7 @@ async def decode_token(token: str):
 
 async def decode_access_token(token: str):
     uuid = (jwt.decode(token, settings.auth_jwt.public_key_path.read_text(),
-                       algorithms=settings.auth_jwt.algorithm)).get("user_id")
+                       algorithms=settings.auth_jwt.algorithm))["user_id"]
     return uuid
 
 
