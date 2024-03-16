@@ -14,3 +14,13 @@ class RegistrationRequest(BaseModel):
 class Secret(BaseModel):
     secret: uuid.UUID
     created_by: str
+
+
+class Tokens(BaseModel):
+    access_token: str
+    refresh_token: str
+
+
+class LoggingData(BaseModel):
+    username: str
+    password: str

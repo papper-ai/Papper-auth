@@ -1,14 +1,11 @@
-from typing import NoReturn
-
 import jwt.exceptions
 import uuid
-from fastapi import Cookie, HTTPException, status, Form
-from pydantic import UUID4
+from fastapi import Cookie, HTTPException, status, Form, Body
 from auth import utils
 from auth.schemas import RegistrationRequest, Secret
 
 
-async def authentication_with_token(access_token: str = Cookie(alias="access-token")):
+async def authentication_with_token(access_token: str = Body(..., embed=True)):
     try:
         return await utils.decode_access_token(access_token)
 
@@ -24,11 +21,6 @@ async def authentication_with_token(access_token: str = Cookie(alias="access-tok
             detail="Invalid token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-
-def registration_depends(secret: uuid.UUID = Form(...), name: str = Form(...), surname: str = Form(...), login: str = Form(...),
-                         password: str = Form(...)):
-    return RegistrationRequest(secret=secret, name=name, surname=surname, login=login, password=password)
 
 
 def add_secret_depends(secret: uuid.UUID = Form(..., description='17374954-9f59-4bdd-873f-9d30b95549bf'),
