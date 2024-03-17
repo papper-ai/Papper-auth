@@ -21,7 +21,7 @@ class User(Base):
     name = mapped_column(String, nullable=False)
     surname = mapped_column(String, nullable=False)
 
-    used_secret = mapped_column(ForeignKey("secrets.secret"), nullable=True, unique=True)
+    used_secret = mapped_column(ForeignKey("secrets.secret"), nullable=True)
 
     created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_active = mapped_column(Boolean, default=True)
