@@ -21,11 +21,6 @@ class Tokens(BaseModel):
     refresh_token: str
 
 
-class LoggingData(BaseModel):
-    username: str
-    password: str
-
-
 class LoginCredentials(BaseModel):
     login: str
     password: str
