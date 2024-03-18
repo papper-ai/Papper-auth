@@ -3,6 +3,8 @@ version: '3.9'
 services:
   db:
     image: postgres:16.1-bullseye
+    networks:
+      - papper-backend
     volumes:
       - db_data:/var/lib/postgresql/data
     env_file:
@@ -15,6 +17,9 @@ services:
       - '${DB_CONTAINER_PORT}:${DB_PORT}'
   auth-service:
     build: auth-service
+    container_name: auth-service
+    networks:
+      - papper-backend
     volumes:
       - ./auth-service:/usr/src/auth-service
     env_file:
@@ -28,3 +33,8 @@ services:
 
 volumes:
   db_data:
+
+networks:
+  papper-backend:
+    name: papper-backend
+    external: true
