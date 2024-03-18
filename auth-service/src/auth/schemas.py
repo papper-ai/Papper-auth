@@ -24,3 +24,8 @@ class Tokens(BaseModel):
 class LoggingData(BaseModel):
     username: str
     password: str
+
+
+class LoginCredentials(BaseModel):
+    login: str
+    password: str
