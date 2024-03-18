@@ -62,7 +62,9 @@ async def login_for_access_token(
     login_credentials: auth_models.LoginCredentials,
     user_repository: UserRepository = Depends(UserRepository),
 ):
-    logging_data = auth_models.LoggingData(username=login_credentials.login, password=login_credentials.password)
+    logging_data = auth_models.LoggingData(
+        username=login_credentials.login, password=login_credentials.password
+    )
     user = await utils.authenticate_user(
         logging_data.username, logging_data.password, user_repository
     )
