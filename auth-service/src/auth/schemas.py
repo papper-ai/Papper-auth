@@ -22,5 +22,5 @@ class Tokens(BaseModel):
 
 
 class LoggingData(BaseModel):
-    login: str
+    username: str
     password: str
