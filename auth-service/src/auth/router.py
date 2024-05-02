@@ -73,7 +73,7 @@ async def login_for_access_token(
         )
 
     access_token = await utils.create_token(
-        data={"user_id": user.user_id},
+        data={"user_id": user.user_id, "login": user.login},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     refresh_token = await utils.create_token(
@@ -91,11 +91,14 @@ async def login_for_access_token(
     description="Refresh access-token and refresh-token key pair. Use when a user "
     "authentication error occurs to get a new key pair",
 )
-async def refresh_token_regenerate(refresh_token: str = Body(..., embed=True)):
-    user_id = await utils.decode_token(refresh_token)
+async def refresh_token_regenerate(refresh_token: str = Body(..., embed=True),
+                                    user_repository: UserRepository = Depends(UserRepository)):
+    decoded_token = await utils.decode_token(refresh_token)
+    user_id = decoded_token.user_id
+    user = await user_repository.get(user_id)
 
     access_token = await utils.create_token(
-        data={"user_id": user_id},
+        data={"user_id": user_id, "login": user.login},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     refresh_token = await utils.create_token(

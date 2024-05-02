@@ -11,6 +11,7 @@ from repositories import models
 from repositories.postgres_repository import UserRepository, SecretRepository
 from pydantic import UUID4
 
+DecodedToken = typing.NamedTuple("decoded_token", [("user_id", str), ("login", str)])
 
 async def authenticate_user(login: str, password: str,
                             user_repository: UserRepository) -> typing.Union[models.User, bool]:
@@ -28,11 +29,15 @@ async def create_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-async def decode_token(token: str):
+async def decode_token(token: str) -> DecodedToken:
     user_id = (
         jwt.decode(token, settings.auth_jwt.public_key_path.read_text(), algorithms=settings.auth_jwt.algorithm)).get(
         "user_id")
-    return user_id
+    login = (
+        jwt.decode(token, settings.auth_jwt.public_key_path.read_text(), algorithms=settings.auth_jwt.algorithm)).get(
+        "login"
+    )
+    return DecodedToken(user_id=user_id, login=login)
 
 
 async def decode_access_token(token: str):
