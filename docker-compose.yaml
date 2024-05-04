@@ -1,12 +1,12 @@
 version: '3.9'
 
 services:
-  db:
+  db-auth:
     image: postgres:16.1-bullseye
     networks:
       - papper-backend
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_auth_data:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -32,7 +32,7 @@ services:
       sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
-  db_data:
+  db_auth_data:
 
 networks:
   papper-backend:
