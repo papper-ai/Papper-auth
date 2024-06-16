@@ -1,4 +1,6 @@
 import uuid
+
+from sqladmin import ModelView
 from sqlalchemy import DateTime, String, func, Boolean, ForeignKey, Integer, UUID, text
 from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
 
@@ -45,4 +47,12 @@ class Secret(Base):
     # def __repr__(self):
     #     return f"Secret(secret={self.secret!r}, created_by={self.created_by!r}, used_by={self.used_by!r}, is_used={self.is_used!r}, created_at={self.created_at!r})"
     #
+
+
+class SecretsAdmin(ModelView, model=Secret):
+    column_list = [Secret.secret, Secret.created_by, Secret.used_by, Secret.is_used, Secret.created_at]
+
+
+class UsersAdmin(ModelView, model=User):
+    column_list = [User.user_id, User.login, User.password, User.name, User.surname, User.used_secret, User.created_at, User.is_active]
 
