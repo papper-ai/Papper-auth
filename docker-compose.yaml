@@ -2,11 +2,10 @@ version: '3.9'
 
 services:
   db-auth:
+    container_name: papper-auth-postgres
     image: postgres:16.1-bullseye
-    networks:
-      - papper-backend
     volumes:
-      - db_auth_data:/var/lib/postgresql/data
+      - papper-auth-postgres:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -17,9 +16,7 @@ services:
       - '${DB_CONTAINER_PORT}:${DB_PORT}'
   auth-service:
     build: auth-service
-    container_name: auth-service
-    networks:
-      - papper-backend
+    container_name: papper-auth-service
     volumes:
       - ./auth-service:/usr/src/auth-service
     env_file:
@@ -32,9 +29,4 @@ services:
       sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
-  db_auth_data:
-
-networks:
-  papper-backend:
-    name: papper-backend
-    external: true
+  papper-auth-postgres:
