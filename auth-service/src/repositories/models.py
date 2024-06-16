@@ -54,5 +54,5 @@ class SecretsAdmin(ModelView, model=Secret):
 
 
 class UsersAdmin(ModelView, model=User):
-    column_list = [User.user_id, User.login, User.password, User.name, User.surname, User.used_secret, User.created_at, User.is_active]
+    column_list = [User.user_id, User.login, User.name, User.surname, User.used_secret, User.created_at, User.is_active]
 
