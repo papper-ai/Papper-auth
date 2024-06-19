@@ -4,6 +4,8 @@ services:
   db-auth:
     container_name: papper-auth-postgres
     image: postgres:16.1-bullseye
+    networks:
+      - papper-auth-service-network
     volumes:
       - papper-auth-postgres:/var/lib/postgresql/data
     env_file:
@@ -17,6 +19,9 @@ services:
   auth-service:
     build: auth-service
     container_name: papper-auth-service
+    networks:
+      - papper-auth-service-network
+      - papper-backend
     volumes:
       - ./auth-service:/usr/src/auth-service
     env_file:
@@ -30,3 +35,10 @@ services:
 
 volumes:
   papper-auth-postgres:
+
+networks:
+  papper-auth-service-network:
+    name: papper-auth-service-network
+  papper-backend:
+    name: papper-backend
+    external: true
