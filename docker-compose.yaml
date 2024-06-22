@@ -16,7 +16,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - '${DB_CONTAINER_PORT}:${DB_PORT}'
-  auth-service:
+  papper-auth-service:
     build: auth-service
     container_name: papper-auth-service
     networks:
