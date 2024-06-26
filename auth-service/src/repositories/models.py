@@ -28,6 +28,7 @@ class User(Base):
     user_id = mapped_column(UUID(as_uuid=False), default=uuid_default, primary_key=True)
     login = mapped_column(String, nullable=False, unique=True)
     password = mapped_column(String, nullable=False)
+    has_face_id = mapped_column(Boolean, default=False)
 
     name = mapped_column(String, nullable=False)
     surname = mapped_column(String, nullable=False)
