@@ -38,10 +38,15 @@ class UserRepository(AbstractRepository):
             async with session.begin():
                 session.add(entity)
 
-    async def get(self, user_id: str) -> typing.Union[models.User, None]:  # works only with PK
+    async def get(self, user_id: str | uuid.UUID) -> typing.Union[models.User, None]:  # works only with PK
         async with self.session as session:
             user = await session.get(models.User, user_id)
             return user
+
+    async def merge(self, entity: models.User) -> None:
+        async with self.session as session:
+            async with session.begin():
+                await session.merge(entity)
 
     async def get_user_by_login(self, login: str) -> typing.Union[models.User, None]:
         async with self.session as session:
