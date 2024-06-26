@@ -7,12 +7,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from auth import schemas as auth_models
 from auth import utils
 from auth.dependencies import authentication_with_token, add_secret_depends
+from auth.utils import get_access_and_refresh_tokens
 from config import settings
 from repositories import models as repo_models
 from repositories.postgres_repository import UserRepository, SecretRepository
 
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth_jwt.access_token_expire_minutes
-REFRESH_TOKEN_EXPIRE_HOURS = settings.auth_jwt.refresh_token_expire_hours
 DOMAIN = settings.domain
 
 auth_router = APIRouter(prefix="/personal")
@@ -72,16 +71,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = await utils.create_token(
-        data={"user_id": user.user_id, "login": user.login},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-    refresh_token = await utils.create_token(
-        data={"user_id": user.user_id},
-        expires_delta=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS),
-    )
-
-    return auth_models.Tokens(access_token=access_token, refresh_token=refresh_token)
+    return await get_access_and_refresh_tokens(user)
 
 
 @auth_router.post(
@@ -97,16 +87,7 @@ async def refresh_token_regenerate(refresh_token: str = Body(..., embed=True),
     user_id = decoded_token.user_id
     user = await user_repository.get(user_id)
 
-    access_token = await utils.create_token(
-        data={"user_id": user_id, "login": user.login},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
-    refresh_token = await utils.create_token(
-        data={"user_id": user_id},
-        expires_delta=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS),
-    )
-
-    return auth_models.Tokens(access_token=access_token, refresh_token=refresh_token)
+    return await get_access_and_refresh_tokens(user)
 
 
 @auth_router.post("/user", description="Get user by access-token (used for debugging)")
@@ -116,6 +97,17 @@ async def get_user(
 ):
     user = await user_repository.get(user_id)
     return user.__dict__
+
+
+@auth_router.post("/user/update", description="Update User")
+async def update_user(
+    user_id: uuid.UUID = Body(..., embed=True),
+    has_face_id: bool = Body(..., embed=True),
+    user_repository: UserRepository = Depends(UserRepository),
+):
+    user = await user_repository.get(user_id)
+    user.is_active = has_face_id
+    await user_repository.merge(user)
 
 
 @auth_router.post("/secrets", description="Get all secrets")
