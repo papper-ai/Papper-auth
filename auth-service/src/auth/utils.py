@@ -6,12 +6,17 @@ import jwt
 import uuid
 from fastapi import HTTPException, status
 
+from auth.schemas import Tokens
 from config import settings
 from repositories import models
 from repositories.postgres_repository import UserRepository, SecretRepository
 from pydantic import UUID4
 
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.auth_jwt.access_token_expire_minutes
+REFRESH_TOKEN_EXPIRE_HOURS = settings.auth_jwt.refresh_token_expire_hours
+
 DecodedToken = typing.NamedTuple("decoded_token", [("user_id", str), ("login", str)])
+
 
 async def authenticate_user(login: str, password: str,
                             user_repository: UserRepository) -> typing.Union[models.User, bool]:
@@ -27,6 +32,19 @@ async def create_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(data, settings.auth_jwt.private_key_path.read_text(),
                              algorithm=settings.auth_jwt.algorithm)
     return encoded_jwt
+
+
+async def get_access_and_refresh_tokens(user: models.User) -> Tokens:
+    access_token = await create_token(
+        data={"user_id": user.user_id, "login": user.login, "has_face_id": user.has_face_id},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    refresh_token = await create_token(
+        data={"user_id": user.user_id, "has_face_id": user.has_face_id},
+        expires_delta=timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS),
+    )
+
+    return Tokens(access_token=access_token, refresh_token=refresh_token)
 
 
 async def decode_token(token: str) -> DecodedToken:
