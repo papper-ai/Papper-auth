@@ -9,7 +9,16 @@ def uuid_default():
     return str(uuid.uuid4())
 
 
-class Base(DeclarativeBase):
+class StrMixin:
+    def __str__(self):
+        # Получаем словарь всех атрибутов объекта, исключая приватные и защищенные
+        fields = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+        # Создаем строковое представление
+        fields_str = ', '.join(f"{key}={value}" for key, value in fields.items())
+        return f"{self.__class__.__name__}({fields_str})"
+
+
+class Base(DeclarativeBase, StrMixin):
     pass
 
 
