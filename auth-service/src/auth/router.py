@@ -99,6 +99,13 @@ async def get_user(
     return user.__dict__
 
 
+@auth_router.get("/user/{uuid}/token", description="Get access-token by user UUID",
+                 response_model=auth_models.Tokens)
+async def get_token_by_uuid(uuid: uuid.UUID, user_repository: UserRepository = Depends(UserRepository)):
+    user = await user_repository.get(uuid)
+    return await get_access_and_refresh_tokens(user)
+
+
 @auth_router.post("/user/update", description="Update User")
 async def update_user(
     user_id: uuid.UUID = Body(..., embed=True),
